@@ -1,1 +1,381 @@
+// ==========================================
+// 01. Two Sum (Easy/01_TwoSum.java)
+// ==========================================
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+class Solution01 {
+    public int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[] { map.get(complement), i };
+            }
+            map.put(nums[i], i);
+        }
+        return new int[] {};
+    }
+}
+
+// ==========================================
+// 02. Palindrome Number (Easy/02_PalindromeNumber.java)
+// ==========================================
+class Solution02 {
+    public boolean isPalindrome(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) {
+            return false;
+        }
+        int reversedHalf = 0;
+        while (x > reversedHalf) {
+            reversedHalf = reversedHalf * 10 + x % 10;
+            x /= 10;
+        }
+        return x == reversedHalf || x == reversedHalf / 10;
+    }
+}
+
+// ==========================================
+// 03. Roman to Integer (Easy/03_RomanToInteger.java)
+// ==========================================
+class Solution03 {
+    public int romanToInt(String s) {
+        Map<Character, Integer> values = new HashMap<>();
+        values.put('I', 1);
+        values.put('V', 5);
+        values.put('X', 10);
+        values.put('L', 50);
+        values.put('C', 100);
+        values.put('D', 500);
+        values.put('M', 1000);
+
+        int total = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int current = values.get(s.charAt(i));
+            if (i + 1 < s.length() && current < values.get(s.charAt(i + 1))) {
+                total -= current;
+            } else {
+                total += current;
+            }
+        }
+        return total;
+    }
+}
+
+// ==========================================
+// 04. Longest Common Prefix (Easy/04_LongestCommonPrefix.java)
+// ==========================================
+class Solution04 {
+    public String longestCommonPrefix(String[] strs) {
+        if (strs == null || strs.length == 0) {
+            return "";
+        }
+        String prefix = strs[0];
+        for (int i = 1; i < strs.length; i++) {
+            while (strs[i].indexOf(prefix) != 0) {
+                prefix = prefix.substring(0, prefix.length() - 1);
+                if (prefix.isEmpty()) {
+                    return "";
+                }
+            }
+        }
+        return prefix;
+    }
+}
+
+// ==========================================
+// 05. Merge Two Sorted Lists (Easy/05_MergeTwoSortedLists.java)
+// ==========================================
+class Solution05 {
+    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode dummy = new ListNode(-1);
+        ListNode current = dummy;
+
+        while (list1 != null && list2 != null) {
+            if (list1.val <= list2.val) {
+                current.next = list1;
+                list1 = list1.next;
+            } else {
+                current.next = list2;
+                list2 = list2.next;
+            }
+            current = current.next;
+        }
+
+        current.next = (list1 != null) ? list1 : list2;
+        return dummy.next;
+    }
+}
+
+// ==========================================
+// 06. Remove Duplicates from Sorted Array (Easy/06_RemoveDuplicatesFromSortedArray.java)
+// ==========================================
+class Solution06 {
+    public int removeDuplicates(int[] nums) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        int k = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] != nums[i - 1]) {
+                nums[k] = nums[i];
+                k++;
+            }
+        }
+        return k;
+    }
+}
+
+// ==========================================
+// 07. Remove Element (Easy/07_RemoveElement.java)
+// ==========================================
+class Solution07 {
+    public int removeElement(int[] nums, int val) {
+        int k = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != val) {
+                nums[k] = nums[i];
+                k++;
+            }
+        }
+        return k;
+    }
+}
+
+// ==========================================
+// 08. Find the Index of the First Occurrence in a String (Easy/08_FindTheIndexOfTheFirstOccurrenceInAString.java)
+// ==========================================
+class Solution08 {
+    public int strStr(String haystack, String needle) {
+        int n = haystack.length();
+        int m = needle.length();
+        if (m == 0) {
+            return 0;
+        }
+        for (int i = 0; i <= n - m; i++) {
+            if (haystack.substring(i, i + m).equals(needle)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+
+// ==========================================
+// 09. Search Insert Position (Easy/09_SearchInsertPosition.java)
+// ==========================================
+class Solution09 {
+    public int searchInsert(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return left;
+    }
+}
+
+// ==========================================
+// 10. Length of Last Word (Easy/10_LengthOfLastWord.java)
+// ==========================================
+class Solution10 {
+    public int lengthOfLastWord(String s) {
+        int length = 0;
+        int i = s.length() - 1;
+        while (i >= 0 && s.charAt(i) == ' ') {
+            i--;
+        }
+        while (i >= 0 && s.charAt(i) != ' ') {
+            length++;
+            i--;
+        }
+        return length;
+    }
+}
+
+// ==========================================
+// 11. Plus One (Easy/11_PlusOne.java)
+// ==========================================
+class Solution11 {
+    public int[] plusOne(int[] digits) {
+        for (int i = digits.length - 1; i >= 0; i--) {
+            if (digits[i] < 9) {
+                digits[i]++;
+                return digits;
+            }
+            digits[i] = 0;
+        }
+        int[] result = new int[digits.length + 1];
+        result[0] = 1;
+        return result;
+    }
+}
+
+// ==========================================
+// 12. Sqrt(x) (Easy/12_SqrtX.java)
+// ==========================================
+class Solution12 {
+    public int mySqrt(int x) {
+        if (x < 2) {
+            return x;
+        }
+        int left = 1;
+        int right = x / 2;
+        int ans = 0;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if ((long) mid * mid <= x) {
+                ans = mid;
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return ans;
+    }
+}
+
+// ==========================================
+// 13. Climbing Stairs (Easy/13_ClimbingStairs.java)
+// ==========================================
+class Solution13 {
+    public int climbStairs(int n) {
+        if (n <= 2) {
+            return n;
+        }
+        int prev2 = 1;
+        int prev1 = 2;
+        for (int i = 3; i <= n; i++) {
+            int current = prev1 + prev2;
+            prev2 = prev1;
+            prev1 = current;
+        }
+        return prev1;
+    }
+}
+
+// ==========================================
+// 14. Best Time to Buy and Sell Stock (Easy/14_BestTimeToBuyAndSellStock.java)
+// ==========================================
+class Solution14 {
+    public int maxProfit(int[] prices) {
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int price : prices) {
+            if (price < minPrice) {
+                minPrice = price;
+            } else if (price - minPrice > maxProfit) {
+                maxProfit = price - minPrice;
+            }
+        }
+        return maxProfit;
+    }
+}
+
+// ==========================================
+// 15. Single Number (Easy/15_SingleNumber.java)
+// ==========================================
+class Solution15 {
+    public int singleNumber(int[] nums) {
+        int result = 0;
+        for (int num : nums) {
+            result ^= num;
+        }
+        return result;
+    }
+}
+
+// ==========================================
+// 16. Majority Element (Easy/16_MajorityElement.java)
+// ==========================================
+class Solution16 {
+    public int majorityElement(int[] nums) {
+        int candidate = 0;
+        int count = 0;
+        for (int num : nums) {
+            if (count == 0) {
+                candidate = num;
+            }
+            count += (num == candidate) ? 1 : -1;
+        }
+        return candidate;
+    }
+}
+
+// ==========================================
+// 17. Move Zeroes (Easy/17_MoveZeroes.java)
+// ==========================================
+class Solution17 {
+    public void moveZeroes(int[] nums) {
+        int insertPos = 0;
+        for (int num : nums) {
+            if (num != 0) {
+                nums[insertPos++] = num;
+            }
+        }
+        while (insertPos < nums.length) {
+            nums[insertPos++] = 0;
+        }
+    }
+}
+
+// ==========================================
+// 18. Contains Duplicate (Easy/18_ContainsDuplicate.java)
+// ==========================================
+class Solution18 {
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> seen = new HashSet<>();
+        for (int num : nums) {
+            if (!seen.add(num)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+// ==========================================
+// 19. Missing Number (Easy/19_MissingNumber.java)
+// ==========================================
+class Solution19 {
+    public int missingNumber(int[] nums) {
+        int n = nums.length;
+        int expectedSum = n * (n + 1) / 2;
+        int actualSum = 0;
+        for (int num : nums) {
+            actualSum += num;
+        }
+        return expectedSum - actualSum;
+    }
+}
+
+// ==========================================
+// 20. Valid Anagram (Easy/20_ValidAnagram.java)
+// ==========================================
+class Solution20 {
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) {
+            return false;
+        }
+        int[] counts = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            counts[s.charAt(i) - 'a']++;
+            counts[t.charAt(i) - 'a']--;
+        }
+        for (int count : counts) {
+            if (count != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
