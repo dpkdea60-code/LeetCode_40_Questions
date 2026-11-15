@@ -1,0 +1,365 @@
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
+
+// ==========================================
+// 31. Median of Two Sorted Arrays (Hard/31_MedianOfTwoSortedArrays.java)
+// ==========================================
+class Solution31 {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        if (nums1.length > nums2.length) {
+            return findMedianSortedArrays(nums2, nums1);
+        }
+
+        int m = nums1.length;
+        int n = nums2.length;
+        int left = 0;
+        int right = m;
+
+        while (left <= right) {
+            int partitionX = (left + right) / 2;
+            int partitionY = (m + n + 1) / 2 - partitionX;
+
+            int maxLeftX = (partitionX == 0) ? Integer.MIN_VALUE : nums1[partitionX - 1];
+            int minRightX = (partitionX == m) ? Integer.MAX_VALUE : nums1[partitionX];
+
+            int maxLeftY = (partitionY == 0) ? Integer.MIN_VALUE : nums2[partitionY - 1];
+            int minRightY = (partitionY == n) ? Integer.MAX_VALUE : nums2[partitionY];
+
+            if (maxLeftX <= minRightY && maxLeftY <= minRightX) {
+                if ((m + n) % 2 == 0) {
+                    return (Math.max(maxLeftX, maxLeftY) + Math.min(minRightX, minRightY)) / 2.0;
+                } else {
+                    return Math.max(maxLeftX, maxLeftY);
+                }
+            } else if (maxLeftX > minRightY) {
+                right = partitionX - 1;
+            } else {
+                left = partitionX + 1;
+            }
+        }
+        return 0.0;
+    }
+}
+
+// ==========================================
+// 32. Regular Expression Matching (Hard/32_RegularExpressionMatching.java)
+// ==========================================
+class Solution32 {
+    public boolean isMatch(String s, String p) {
+        int m = s.length();
+        int n = p.length();
+        boolean[][] dp = new boolean[m + 1][n + 1];
+        dp[0][0] = true;
+
+        for (int j = 2; j <= n; j++) {
+            if (p.charAt(j - 1) == '*') {
+                dp[0][j] = dp[0][j - 2];
+            }
+        }
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                char sc = s.charAt(i - 1);
+                char pc = p.charAt(j - 1);
+
+                if (pc == '.' || pc == sc) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else if (pc == '*') {
+                    dp[i][j] = dp[i][j - 2];
+                    char prev = p.charAt(j - 2);
+                    if (prev == '.' || prev == sc) {
+                        dp[i][j] = dp[i][j] || dp[i - 1][j];
+                    }
+                }
+            }
+        }
+        return dp[m][n];
+    }
+}
+
+// ==========================================
+// 33. Merge k Sorted Lists (Hard/33_MergeKSortedLists.java)
+// ==========================================
+class Solution33 {
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) {
+            return null;
+        }
+
+        PriorityQueue<ListNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));
+        for (ListNode node : lists) {
+            if (node != null) {
+                minHeap.offer(node);
+            }
+        }
+
+        ListNode dummy = new ListNode(0);
+        ListNode current = dummy;
+
+        while (!minHeap.isEmpty()) {
+            ListNode smallest = minHeap.poll();
+            current.next = smallest;
+            current = current.next;
+            if (smallest.next != null) {
+                minHeap.offer(smallest.next);
+            }
+        }
+        return dummy.next;
+    }
+}
+
+// ==========================================
+// 34. Trapping Rain Water (Hard/34_TrappingRainWater.java)
+// ==========================================
+class Solution34 {
+    public int trap(int[] height) {
+        int left = 0;
+        int right = height.length - 1;
+        int leftMax = 0;
+        int rightMax = 0;
+        int water = 0;
+
+        while (left < right) {
+            if (height[left] < height[right]) {
+                if (height[left] >= leftMax) {
+                    leftMax = height[left];
+                } else {
+                    water += leftMax - height[left];
+                }
+                left++;
+            } else {
+                if (height[right] >= rightMax) {
+                    rightMax = height[right];
+                } else {
+                    water += rightMax - height[right];
+                }
+                right--;
+            }
+        }
+        return water;
+    }
+}
+
+// ==========================================
+// 35. N-Queens (Hard/35_NQueens.java)
+// ==========================================
+class Solution35 {
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> results = new ArrayList<>();
+        char[][] board = new char[n][n];
+        for (char[] row : board) {
+            Arrays.fill(row, '.');
+        }
+        boolean[] cols = new boolean[n];
+        boolean[] diag1 = new boolean[2 * n];
+        boolean[] diag2 = new boolean[2 * n];
+
+        backtrack(0, n, board, cols, diag1, diag2, results);
+        return results;
+    }
+
+    private void backtrack(int row, int n, char[][] board, boolean[] cols, boolean[] diag1, boolean[] diag2, List<List<String>> results) {
+        if (row == n) {
+            List<String> solution = new ArrayList<>();
+            for (char[] r : board) {
+                solution.add(new String(r));
+            }
+            results.add(solution);
+            return;
+        }
+
+        for (int col = 0; col < n; col++) {
+            int d1 = row - col + n;
+            int d2 = row + col;
+            if (cols[col] || diag1[d1] || diag2[d2]) {
+                continue;
+            }
+
+            board[row][col] = 'Q';
+            cols[col] = diag1[d1] = diag2[d2] = true;
+
+            backtrack(row + 1, n, board, cols, diag1, diag2, results);
+
+            board[row][col] = '.';
+            cols[col] = diag1[d1] = diag2[d2] = false;
+        }
+    }
+}
+
+// ==========================================
+// 36. Word Ladder (Hard/36_WordLadder.java)
+// ==========================================
+class Solution36 {
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        Set<String> wordSet = new HashSet<>(wordList);
+        if (!wordSet.contains(endWord)) {
+            return 0;
+        }
+
+        Queue<String> queue = new LinkedList<>();
+        queue.offer(beginWord);
+        int level = 1;
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                char[] chars = queue.poll().toCharArray();
+                for (int j = 0; j < chars.length; j++) {
+                    char original = chars[j];
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        if (c == original) continue;
+                        chars[j] = c;
+                        String nextWord = new String(chars);
+                        if (nextWord.equals(endWord)) {
+                            return level + 1;
+                        }
+                        if (wordSet.remove(nextWord)) {
+                            queue.offer(nextWord);
+                        }
+                    }
+                    chars[j] = original;
+                }
+            }
+            level++;
+        }
+        return 0;
+    }
+}
+
+// ==========================================
+// 37. Sudoku Solver (Hard/37_SudokuSolver.java)
+// ==========================================
+class Solution37 {
+    public void solveSudoku(char[][] board) {
+        solve(board);
+    }
+
+    private boolean solve(char[][] board) {
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                if (board[r][c] == '.') {
+                    for (char num = '1'; num <= '9'; num++) {
+                        if (isValid(board, r, c, num)) {
+                            board[r][c] = num;
+                            if (solve(board)) {
+                                return true;
+                            }
+                            board[r][c] = '.';
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isValid(char[][] board, int row, int col, char num) {
+        int boxRow = (row / 3) * 3;
+        int boxCol = (col / 3) * 3;
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num) return false;
+            if (board[i][col] == num) return false;
+            if (board[boxRow + i / 3][boxCol + i % 3] == num) return false;
+        }
+        return true;
+    }
+}
+
+// ==========================================
+// 38. Minimum Window Substring (Hard/38_MinimumWindowSubstring.java)
+// ==========================================
+class Solution38 {
+    public String minWindow(String s, String t) {
+        if (s.length() < t.length()) {
+            return "";
+        }
+
+        int[] need = new int[128];
+        for (char c : t.toCharArray()) {
+            need[c]++;
+        }
+
+        int required = t.length();
+        int left = 0;
+        int minLen = Integer.MAX_VALUE;
+        int minStart = 0;
+
+        for (int right = 0; right < s.length(); right++) {
+            char rc = s.charAt(right);
+            if (need[rc] > 0) {
+                required--;
+            }
+            need[rc]--;
+
+            while (required == 0) {
+                if (right - left + 1 < minLen) {
+                    minLen = right - left + 1;
+                    minStart = left;
+                }
+                char lc = s.charAt(left);
+                need[lc]++;
+                if (need[lc] > 0) {
+                    required++;
+                }
+                left++;
+            }
+        }
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(minStart, minStart + minLen);
+    }
+}
+
+// ==========================================
+// 39. Largest Rectangle in Histogram (Hard/39_LargestRectangleInHistogram.java)
+// ==========================================
+class Solution39 {
+    public int largestRectangleArea(int[] heights) {
+        Deque<Integer> stack = new ArrayDeque<>();
+        int maxArea = 0;
+        int n = heights.length;
+
+        for (int i = 0; i <= n; i++) {
+            int currentHeight = (i == n) ? 0 : heights[i];
+            while (!stack.isEmpty() && currentHeight < heights[stack.peek()]) {
+                int height = heights[stack.pop()];
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                maxArea = Math.max(maxArea, height * width);
+            }
+            stack.push(i);
+        }
+        return maxArea;
+    }
+}
+
+// ==========================================
+// 40. Edit Distance (Hard/40_EditDistance.java)
+// ==========================================
+class Solution40 {
+    public int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        int[][] dp = new int[m + 1][n + 1];
+
+        for (int i = 0; i <= m; i++) dp[i][0] = i;
+        for (int j = 0; j <= n; j++) dp[0][j] = j;
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = 1 + Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1]));
+                }
+            }
+        }
+        return dp[m][n];
+    }
+}
